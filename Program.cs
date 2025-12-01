@@ -9,14 +9,14 @@
 }
 public class Program
 {
-    public static Quadrado[,] criarCampoMinado(int numeroDeBombas,int tamanhoX,int tamanhoY)
+    public static Quadrado[,] criarCampoMinado(int numeroDeBombas, int tamanhoX, int tamanhoY)
     {
-        Quadrado[,] campo = new Quadrado[tamanhoX,tamanhoY];
+        Quadrado[,] campo = new Quadrado[tamanhoX, tamanhoY];
         Random random = new Random();
         numeroDeBombas = tamanhoX * tamanhoY / tamanhoX + tamanhoY;
         for (int i = 0; i < numeroDeBombas; i++)
         {
-            campo[random.Next(tamanhoX), random.Next(tamanhoY)].Bomba = true ;
+            campo[random.Next(tamanhoX), random.Next(tamanhoY)].Bomba = true;
         }
         for (int x = 0; x < campo.GetLength(0); x++)
         {
@@ -28,18 +28,19 @@ public class Program
         return campo;
     }
 
-    public static int contarBombasAoRedor(Quadrado[,] CampoMinado,int x,int y)
+    public static int contarBombasAoRedor(Quadrado[,] CampoMinado, int x, int y)
     {
         int xAoRedorMin = Math.Max(0, x - 1);
         int yAoRedorMin = Math.Max(0, y - 1);
-        int xAoRedorMax = Math.Min(CampoMinado.GetLength(0) - 1, x+1);
-        int yAoRedorMax = Math.Min(CampoMinado.GetLength(1) - 1, y+1);
+        int xAoRedorMax = Math.Min(CampoMinado.GetLength(0) - 1, x + 1);
+        int yAoRedorMax = Math.Min(CampoMinado.GetLength(1) - 1, y + 1);
         int numeroDeBombasAoRedor = 0;
-        for(int xAoRedor = xAoRedorMin; xAoRedor <= xAoRedorMax;xAoRedor++)
+        for (int xAoRedor = xAoRedorMin; xAoRedor <= xAoRedorMax; xAoRedor++)
         {
-            for(int yAoRedor = yAoRedorMin; yAoRedor <= yAoRedorMax;yAoRedor++)
+            for (int yAoRedor = yAoRedorMin; yAoRedor <= yAoRedorMax; yAoRedor++)
             {
-                if(CampoMinado[xAoRedor,yAoRedor].Bomba == true){
+                if (CampoMinado[xAoRedor, yAoRedor].Bomba == true)
+                {
                     numeroDeBombasAoRedor++;
                 }
             }
@@ -52,47 +53,86 @@ public class Program
         {
             for (int x = 0; x < campo.GetLength(0); x++)
             {
-                if (campo[x, y].Bomba)
-                {
-                    Console.Write("!");
-                }else
-                {
-                    Console.Write(campo[x,y].bombasAoRedor);
-                }
+                Console.Write(campo[x, y].simbolo == null ? "■" : campo[x, y].simbolo);
             }
             Console.Write("\n");
         }
     }
-    public static void interagir(Quadrado[,] campo, int x,int y )
+    public static bool morto = false;
+    public static void interagir(Quadrado[,] campo, int x, int y)
     {
-        if (campo[x,y].Bomba == true)
+        if (campo[x, y].foiInteragido == true)
         {
-            morte();
-        }else
-        {
-            campo[x,y].simbolo = Convert.ToChar(campo[x,y].bombasAoRedor);   
+            return;
         }
-        if (campo[x,y].bombasAoRedor == 0)
+        campo[x, y].foiInteragido = true;
+        if (campo[x, y].Bomba == true)
         {
-        int xAoRedorMin = Math.Max(0, x - 1);
-        int yAoRedorMin = Math.Max(0, y - 1);
-        int xAoRedorMax = Math.Min(campo.GetLength(0) - 1, x+1);
-        int yAoRedorMax = Math.Min(campo.GetLength(1) - 1, y+1);
-        for(int xAoRedor = xAoRedorMin; xAoRedor <= xAoRedorMax;xAoRedor++)
+            morto = true;
+        }
+        else
         {
-            for(int yAoRedor = yAoRedorMin; yAoRedor <= yAoRedorMax;yAoRedor++)
+            campo[x, y].simbolo = campo[x, y].bombasAoRedor.ToString()[0];
+        }
+        if (campo[x, y].bombasAoRedor == 0)
+        {
+            campo[x, y].simbolo = '░';
+            int xAoRedorMin = Math.Max(0, x - 1);
+            int yAoRedorMin = Math.Max(0, y - 1);
+            int xAoRedorMax = Math.Min(campo.GetLength(0) - 1, x + 1);
+            int yAoRedorMax = Math.Min(campo.GetLength(1) - 1, y + 1);
+            for (int xAoRedor = xAoRedorMin; xAoRedor <= xAoRedorMax; xAoRedor++)
             {
-                interagir(campo,xAoRedor,yAoRedor);
+                for (int yAoRedor = yAoRedorMin; yAoRedor <= yAoRedorMax; yAoRedor++)
+                {
+                    interagir(campo, xAoRedor, yAoRedor);
+                }
             }
         }
+    }
+    public static void printarLinhas(int numero_de_linhas)
+    {
+        for (int i = 0; i < numero_de_linhas; i++)
+        {
+            Console.WriteLine();
         }
     }
-    public static void morte()
+    public static void morte(Quadrado[,] campo)
     {
-        Console.Clear();
+        printarLinhas(2);
         Console.WriteLine("Você perdeu!");
-
+        for (int y = 0; y < campo.GetLength(1); y++)
+        {
+            for (int x = 0; x < campo.GetLength(0); x++)
+            {
+                if (campo[x, y].Bomba == true)
+                {
+                    campo[x, y].simbolo = 'B';
+                }
+            }
+        }
+        mostrarCampo(campo);
+        Console.WriteLine("Começar de novo? (Sim[s] Não[n])");
+        bool naoRespondido = true;
+        while (naoRespondido)
+        {
+            switch (Console.ReadLine().ToLower())
+            {
+                case "s":
+                    morto = false;
+                    naoRespondido = false;
+                    break;
+                case "n":
+                    ligado = false;
+                    naoRespondido = false;
+                    break;
+                default:
+                    Console.WriteLine("Entrada inválida, escreva novamente..");
+                    break;
+            }
+        }
     }
+    public static bool ligado = true;
     public static void Main(string[] args)
     {
         Console.OutputEncoding = System.Text.Encoding.UTF8;
@@ -120,28 +160,35 @@ public class Program
         Espaco[,] Campo = criarCampo(10,8,8);*/
         bool inicioDoPrograma = true;
         bool partida = false;
-        bool ligado = true;
-        Quadrado[,]? CampoMinado;
+        Quadrado[,]? CampoMinado = null;
         while (ligado)
         {
             while (inicioDoPrograma)
             {
                 Console.WriteLine("Bem vindo!");
                 Console.WriteLine("Qual largura você deseja para o campo?");
-                int xEscolhido = Convert.ToInt32(Console.ReadLine())-1 ;
-                Console.WriteLine("Qual altura você deseja para o campo?") ;
-                int yEscolhido = Convert.ToInt32(Console.ReadLine())-1 ;
-                CampoMinado = criarCampoMinado(0,xEscolhido,yEscolhido);
+                int xEscolhido = Convert.ToInt32(Console.ReadLine());
+                Console.WriteLine("Qual altura você deseja para o campo?");
+                int yEscolhido = Convert.ToInt32(Console.ReadLine());
+                CampoMinado = criarCampoMinado(0, xEscolhido, yEscolhido);
                 partida = true;
                 inicioDoPrograma = false;
             }
             while (partida)
             {
-                
+                mostrarCampo(CampoMinado);
+                Console.WriteLine("Qual coordenada X você deseja interagir?");
+                int xInteragir = Convert.ToInt32(Console.ReadLine()) - 1;
+                Console.WriteLine("Qual coordenada Y você deseja interagir?");
+                int yInteragir = Convert.ToInt32(Console.ReadLine()) - 1;
+                interagir(CampoMinado, xInteragir, yInteragir);
+                if (morto == true)
+                {
+                    inicioDoPrograma = true;
+                    morte(CampoMinado);
+                    partida = false;
+                }
             }
         }
-        mostrarCampo(CampoMinado);
-
-
     }
 }
