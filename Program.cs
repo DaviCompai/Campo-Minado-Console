@@ -11,6 +11,29 @@ public struct Quadrado
 }
 public class Program
 {
+    public static string titulo =
+    @"                                                                                                   
+       ▄▄▄  ▄    ▄          ▄▄▄                                                         
+     ▄▀   ▀ ██  ██ ▄ ▄▄   ▄▀   ▀                                                        
+     █      █ ██ █ █▀  █  █        █                                                    
+     █      █ ▀▀ █ █   █  █                                                             
+      ▀▄▄▄▀ █    █ █   █   ▀▄▄▄▀   █                                                    
+                                                                                    
+                                                                                    
+                                                                                    
+       ▄▄▄                                     ▄    ▄   ▀                      █        
+     ▄▀   ▀  ▄▄▄   ▄▄▄▄▄  ▄▄▄▄    ▄▄▄          ██  ██ ▄▄▄    ▄ ▄▄    ▄▄▄    ▄▄▄█   ▄▄▄  
+     █      ▀   █  █ █ █  █▀ ▀█  █▀ ▀█         █ ██ █   █    █▀  █  ▀   █  █▀ ▀█  █▀ ▀█ 
+     █      ▄▀▀▀█  █ █ █  █   █  █   █         █ ▀▀ █   █    █   █  ▄▀▀▀█  █   █  █   █ 
+      ▀▄▄▄▀ ▀▄▄▀█  █ █ █  ██▄█▀  ▀█▄█▀         █    █ ▄▄█▄▄  █   █  ▀▄▄▀█  ▀█▄██  ▀█▄█▀ 
+                          █                                                             
+                          ▀                                                             
+                                                                                    
+                            ▄▄▄                              ▀▀█                        
+     ▄ ▄▄    ▄▄▄          ▄▀   ▀  ▄▄▄   ▄ ▄▄    ▄▄▄    ▄▄▄     █     ▄▄▄                
+     █▀  █  █▀ ▀█         █      █▀ ▀█  █▀  █  █   ▀  █▀ ▀█    █    █▀  █               
+     █   █  █   █         █      █   █  █   █   ▀▀▀▄  █   █    █    █▀▀▀▀               
+     █   █  ▀█▄█▀          ▀▄▄▄▀ ▀█▄█▀  █   █  ▀▄▄▄▀  ▀█▄█▀    ▀▄▄  ▀█▄▄▀";
     public static int dificuldade = 1;
     public static Quadrado[,] criarCampoMinado(int numeroDeBombas, int tamanhoX, int tamanhoY)
     {
@@ -178,17 +201,19 @@ public class Program
     }
     public static void ColocarBandeira(Quadrado[,] campo, int x, int y)
     {
-        if (campo[x, y].Bandeira == false)
+        if (campo[x, y].foiInteragido == false)
         {
-            campo[x, y].Bandeira = true;
-            campo[x, y].simbolo = '?';
+            if (campo[x, y].Bandeira == false)
+            {
+                campo[x, y].Bandeira = true;
+                campo[x, y].simbolo = '?';
+            }
+            else
+            {
+                campo[x, y].Bandeira = false;
+                campo[x, y].simbolo = '█';
+            }
         }
-        else
-        {
-            campo[x, y].Bandeira = false;
-            campo[x, y].simbolo = '█';
-        }
-
     }
     public static void printarLinhas(int numero_de_linhas)
     {
@@ -309,6 +334,7 @@ public class Program
         bool inicioDoPrograma = true;
         bool partida = false;
         Quadrado[,]? CampoMinado = null;
+        Console.WriteLine(titulo);
         while (ligado)
         {
             while (inicioDoPrograma)
@@ -336,7 +362,7 @@ public class Program
             {
                 while(bJaVenceu(CampoMinado))
                 {
-                    printarLinhas(3);
+                    printarLinhas(2);
                     Console.WriteLine("Parabéns! você ganhou.");
                     Console.WriteLine("Deseja começar novamente? (Sim[s] ou Não[n])");
                     string? escolha = Console.ReadLine();
